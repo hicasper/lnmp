@@ -20,25 +20,52 @@ echo "+-------------------------------------------+"
 arg1=$1
 arg2=$2
 
+Manage_Service()
+{
+    local Name=$1
+    local Action=$2
+
+    if [ "$Name" == 'httpd' ] && [ "$Acton" == 'graceful' ]; then
+        local SAction='reload'
+    else
+        local SAction=$Action
+    fi
+
+    if [ "$SAction" == 'status' ]; then
+        SAction="$SAction -l --no-pager"
+    fi
+
+    if [ "$Action" == 'kill' ]; then
+        /etc/init.d/${Name} ${Action}
+        return
+    fi
+
+    if [ "${isWSL}" != "y" ] && command -v systemctl >/dev/null 2>&1 && [[ -s /etc/systemd/system/${Name}.service || -s /lib/systemd/system/${Name}.service || -s /usr/lib/systemd/system/${Name}.service ]]; then
+        systemctl ${SAction} ${Name}
+    else
+        /etc/init.d/${Name} ${Action}
+    fi
+}
+
 lamp_start()
 {
     echo "Starting LAMP..."
-    /etc/init.d/httpd start
-    /etc/init.d/mysql start
+    Manage_Service httpd start
+    Manage_Service mysql start
 }
 
 lamp_stop()
 {
     echo "Stoping LAMP..."
-    /etc/init.d/httpd stop
-    /etc/init.d/mysql stop
+    Manage_Service httpd stop
+    Manage_Service mysql stop
 }
 
 lamp_reload()
 {
     echo "Reload LAMP..."
-    /etc/init.d/httpd graceful
-    /etc/init.d/mysql reload
+    Manage_Service httpd graceful
+    Manage_Service mysql reload
 }
 
 lamp_kill()
@@ -51,8 +78,8 @@ lamp_kill()
 
 lamp_status()
 {
-    /etc/init.d/httpd status
-    /etc/init.d/mysql status
+    Manage_Service httpd status
+    Manage_Service mysql status
 }
 
 Function_Vhost()
@@ -166,7 +193,7 @@ EOF
     echo "Test Apache configure file..."
     /etc/init.d/httpd configtest
     echo "Restart Apache..."
-    /etc/init.d/httpd graceful
+    Manage_Service httpd graceful
 }
 
 Add_VHost()
@@ -858,10 +885,10 @@ EOF
         if command -v yum >/dev/null 2>&1; then
             yum -y update nss
             yum -y install ca-certificates
-            service crond restart
+            Manage_Service crond restart
             chkconfig crond on
         elif command -v apt-get >/dev/null 2>&1; then
-            /etc/init.d/cron restart
+            Manage_Service cron restart
             update-rc.d cron defaults
         fi
     fi
@@ -922,7 +949,7 @@ EOF
     echo "Test Apache configure file..."
     /etc/init.d/httpd configtest
     echo "Restart Apache..."
-    /etc/init.d/httpd graceful
+    Manage_Service httpd graceful
 }
 
 Add_SSL()
@@ -1195,16 +1222,16 @@ case "${arg1}" in
         lamp_status
         ;;
     mysql)
-        /etc/init.d/mysql ${arg2}
+        Manage_Service mysql ${arg2}
         ;;
     mariadb)
-        /etc/init.d/mariadb ${arg2}
+        Manage_Service mariadb ${arg2}
         ;;
     pureftpd)
-        /etc/init.d/pureftpd ${arg2}
+        Manage_Service pureftpd ${arg2}
         ;;
     httpd)
-        /etc/init.d/httpd ${arg2}
+        Manage_Service httpd ${arg2}
         ;;
     vhost)
         Function_Vhost ${arg2}
