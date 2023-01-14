@@ -22,16 +22,43 @@ PHPFPMPIDFILE=/usr/local/php/var/run/php-fpm.pid
 arg1=$1
 arg2=$2
 
+Manage_Service()
+{
+    local Name=$1
+    local Action=$2
+
+    if [ "$Name" == 'httpd' ] && [ "$Acton" == 'graceful' ]; then
+        local SAction='reload'
+    else
+        local SAction=$Action
+    fi
+
+    if [ "$SAction" == 'status' ]; then
+        SAction="$SAction -l --no-pager"
+    fi
+
+    if [ "$Action" == 'kill' ]; then
+        /etc/init.d/${Name} ${Action}
+        return
+    fi
+
+    if [ "${isWSL}" != "y" ] && command -v systemctl >/dev/null 2>&1 && [[ -s /etc/systemd/system/${Name}.service || -s /lib/systemd/system/${Name}.service || -s /usr/lib/systemd/system/${Name}.service ]]; then
+        systemctl ${SAction} ${Name}
+    else
+        /etc/init.d/${Name} ${Action}
+    fi
+}
+
 lnmp_start()
 {
     echo "Starting LNMP..."
-    /etc/init.d/nginx start
-    /etc/init.d/mysql start
-    /etc/init.d/php-fpm start
+    Manage_Service nginx start
+    Manage_Service mysql start
+    Manage_Service php-fpm start
     for mphpfpm in /etc/init.d/php-fpm[5,7,8].[0-9]
     do
         if [ -f ${mphpfpm} ]; then
-            ${mphpfpm} start
+            Manage_Service ${mphpfpm##*/} start
         fi
     done
 }
@@ -39,13 +66,13 @@ lnmp_start()
 lnmp_stop()
 {
     echo "Stoping LNMP..."
-    /etc/init.d/nginx stop
-    /etc/init.d/mysql stop
-    /etc/init.d/php-fpm stop
+    Manage_Service nginx stop
+    Manage_Service mysql stop
+    Manage_Service php-fpm stop
     for mphpfpm in /etc/init.d/php-fpm[5,7,8].[0-9]
     do
         if [ -f ${mphpfpm} ]; then
-            ${mphpfpm} stop
+            Manage_Service ${mphpfpm##*/} start
         fi
     done
 }
@@ -53,13 +80,13 @@ lnmp_stop()
 lnmp_reload()
 {
     echo "Reload LNMP..."
-    /etc/init.d/nginx reload
-    /etc/init.d/mysql reload
-    /etc/init.d/php-fpm reload
+    Manage_Service nginx reload
+    Manage_Service mysql reload
+    Manage_Service php-fpm reload
     for mphpfpm in /etc/init.d/php-fpm[5,7,8].[0-9]
     do
         if [ -f ${mphpfpm} ]; then
-            ${mphpfpm} reload
+            Manage_Service ${mphpfpm##*/} start
         fi
     done
 }
@@ -76,13 +103,13 @@ lnmp_kill()
 
 lnmp_status()
 {
-    /etc/init.d/nginx status
+    Manage_Service nginx status
     if [ -f $PHPFPMPIDFILE ]; then
         echo "php-fpm is runing!"
     else
         echo "php-fpm is stop!"
     fi
-    /etc/init.d/mysql status
+    Manage_Service mysql status
 }
 
 Function_Vhost()
@@ -588,7 +615,7 @@ EOF
     chmod 644 ${vhostdir}/.user.ini
     chattr +i ${vhostdir}/.user.ini
 
-    /etc/init.d/php-fpm reload
+    Manage_Service php-fpm reload
 
     if [ "${create_database}" == "y" ]; then
         Add_Database
@@ -1209,10 +1236,10 @@ EOF
         if command -v yum >/dev/null 2>&1; then
             yum -y update nss
             yum -y install ca-certificates
-            service crond restart
+            Manage_Service crond restart
             chkconfig crond on
         elif command -v apt-get >/dev/null 2>&1; then
-            /etc/init.d/cron restart
+            Manage_Service cron restart
             update-rc.d cron defaults
         fi
     fi
@@ -1564,19 +1591,19 @@ case "${arg1}" in
         lnmp_status
         ;;
     nginx)
-        /etc/init.d/nginx ${arg2}
+        Manage_Service nginx ${arg2}
         ;;
     mysql)
-        /etc/init.d/mysql ${arg2}
+        Manage_Service mysql ${arg2}
         ;;
     mariadb)
-        /etc/init.d/mariadb ${arg2}
+        Manage_Service mariadb ${arg2}
         ;;
     php-fpm)
-        /etc/init.d/php-fpm ${arg2}
+        Manage_Service php-fpm ${arg2}
         ;;
     pureftpd)
-        /etc/init.d/pureftpd ${arg2}
+        Manage_Service pureftpd ${arg2}
         ;;
     vhost)
         Function_Vhost ${arg2}

@@ -20,28 +20,55 @@ echo "+-------------------------------------------+"
 arg1=$1
 arg2=$2
 
+Manage_Service()
+{
+    local Name=$1
+    local Action=$2
+
+    if [ "$Name" == 'httpd' ] && [ "$Acton" == 'graceful' ]; then
+        local SAction='reload'
+    else
+        local SAction=$Action
+    fi
+
+    if [ "$SAction" == 'status' ]; then
+        SAction="$SAction -l --no-pager"
+    fi
+
+    if [ "$Action" == 'kill' ]; then
+        /etc/init.d/${Name} ${Action}
+        return
+    fi
+
+    if [ "${isWSL}" != "y" ] && command -v systemctl >/dev/null 2>&1 && [[ -s /etc/systemd/system/${Name}.service || -s /lib/systemd/system/${Name}.service || -s /usr/lib/systemd/system/${Name}.service ]]; then
+        systemctl ${SAction} ${Name}
+    else
+        /etc/init.d/${Name} ${Action}
+    fi
+}
+
 lnmpa_start()
 {
     echo "Starting LNMPA..."
-    /etc/init.d/nginx start
-    /etc/init.d/mysql start
-    /etc/init.d/httpd start
+    Manage_Service nginx start
+    Manage_Service mysql start
+    Manage_Service httpd start
 }
 
 lnmpa_stop()
 {
     echo "Stoping LNMPA..."
-    /etc/init.d/nginx stop
-    /etc/init.d/mysql stop
-    /etc/init.d/httpd stop
+    Manage_Service nginx stop
+    Manage_Service mysql stop
+    Manage_Service httpd stop
 }
 
 lnmpa_reload()
 {
     echo "Reload LNMPA..."
-    /etc/init.d/nginx reload
-    /etc/init.d/mysql reload
-    /etc/init.d/httpd graceful
+    Manage_Service nginx reload
+    Manage_Service mysql reload
+    Manage_Service httpd graceful
 }
 
 lnmpa_kill()
@@ -55,9 +82,9 @@ lnmpa_kill()
 
 lnmpa_status()
 {
-    /etc/init.d/nginx status
-    /etc/init.d/mysql status
-    /etc/init.d/httpd status
+    Manage_Service nginx status
+    Manage_Service mysql status
+    Manage_Service httpd status
 }
 
 Function_Vhost()
@@ -219,7 +246,7 @@ EOF
     echo "Test Apache configure file..."
     /etc/init.d/httpd configtest
     echo "Restart Apache..."
-    /etc/init.d/httpd graceful
+    Manage_Service httpd graceful
 }
 
 Add_VHost()
@@ -935,10 +962,10 @@ EOF
         if command -v yum >/dev/null 2>&1; then
             yum -y update nss
             yum -y install ca-certificates
-            service crond restart
+            Manage_Service crond restart
             chkconfig crond on
         elif command -v apt-get >/dev/null 2>&1; then
-            /etc/init.d/cron restart
+            Manage_Service cron restart
             update-rc.d cron defaults
         fi
     fi
@@ -1289,19 +1316,19 @@ case "${arg1}" in
         lnmpa_status
         ;;
     nginx)
-        /etc/init.d/nginx ${arg2}
+        Manage_Service nginx ${arg2}
         ;;
     mysql)
-        /etc/init.d/mysql ${arg2}
+        Manage_Service mysql ${arg2}
         ;;
     mariadb)
-        /etc/init.d/mariadb ${arg2}
+        Manage_Service mariadb ${arg2}
         ;;
     pureftpd)
-        /etc/init.d/pureftpd ${arg2}
+        Manage_Service pureftpd ${arg2}
         ;;
     httpd)
-        /etc/init.d/httpd ${arg2}
+        Manage_Service httpd ${arg2}
         ;;
     vhost)
         Function_Vhost ${arg2}
