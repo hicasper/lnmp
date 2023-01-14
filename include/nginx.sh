@@ -115,7 +115,8 @@ Install_Nginx()
     if [[ "${Nginx_Ver_Com}" == "0" ||  "${Nginx_Ver_Com}" == "1" ]]; then
         ./configure --user=www --group=www --prefix=/usr/local/nginx --with-http_stub_status_module --with-http_ssl_module --with-http_spdy_module --with-http_gzip_static_module --with-ipv6 --with-http_sub_module --with-http_realip_module ${Nginx_With_Openssl} ${Nginx_With_Pcre} ${Nginx_Module_Lua} ${NginxMAOpt} ${Ngx_FancyIndex} ${Nginx_Modules_Options}
     else
-        ./configure --user=www --group=www --prefix=/usr/local/nginx --with-http_stub_status_module --with-http_ssl_module --with-http_v2_module --with-http_gzip_static_module --with-http_sub_module --with-stream --with-stream_ssl_module --with-stream_ssl_preread_module --with-http_realip_module ${Nginx_With_Openssl} ${Nginx_With_Pcre} ${Nginx_Module_Lua} ${NginxMAOpt} ${Ngx_FancyIndex} ${Nginx_Modules_Options}
+        sed -i 's|CFLAGS="$CFLAGS -g"|#CFLAGS="$CFLAGS -g"|' auto/cc/gcc
+        ./configure --user=www --group=www --prefix=/usr/local/nginx --with-ld-opt='-Wl,-z,relro -Wl,-z,now -pie' --with-cc-opt='-O2 -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector-strong --param=ssp-buffer-size=4 -fPIC' --with-http_stub_status_module --with-http_ssl_module --with-http_v2_module --with-http_gzip_static_module --with-http_sub_module --with-stream --with-stream_ssl_module --with-stream_ssl_preread_module --with-http_realip_module ${Nginx_With_Openssl} ${Nginx_With_Pcre} ${Nginx_Module_Lua} ${NginxMAOpt} ${Ngx_FancyIndex} ${Nginx_Modules_Options}
     fi
     Make_Install
     cd ../
@@ -136,6 +137,7 @@ Install_Nginx()
     \cp conf/enable-php.conf /usr/local/nginx/conf/enable-php.conf
     \cp conf/enable-php-pathinfo.conf /usr/local/nginx/conf/enable-php-pathinfo.conf
     \cp -ra conf/example /usr/local/nginx/conf/example
+    \cp conf/realip.conf /usr/local/nginx/conf/realip.conf
     if [ "${Enable_Nginx_Lua}" = 'y' ]; then
         if ! grep -q 'lua_package_path "/usr/local/nginx/lib/lua/?.lua";' /usr/local/nginx/conf/nginx.conf; then
             sed -i "/server_tokens off;/i\        lua_package_path \"/usr/local/nginx/lib/lua/?.lua\";\n" /usr/local/nginx/conf/nginx.conf
@@ -153,7 +155,7 @@ Install_Nginx()
     mkdir -p ${Default_Website_Dir}
     chmod +w ${Default_Website_Dir}
     mkdir -p /home/wwwlogs
-    chmod 777 /home/wwwlogs
+    chmod 755 /home/wwwlogs
 
     chown -R www:www ${Default_Website_Dir}
 
