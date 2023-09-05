@@ -22,6 +22,33 @@ PHPFPMPIDFILE=/usr/local/php/var/run/php-fpm.pid
 arg1=$1
 arg2=$2
 
+Check_WSL() {
+    if [[ "$(< /proc/sys/kernel/osrelease)" == *[Mm]icrosoft* ]]; then
+        echo "running on WSL"
+        isWSL="y"
+    else
+        isWSL="n"
+    fi
+}
+
+Check_Docker() {
+    if [ -f /.dockerenv ]; then
+        echo "running on Docker"
+        isDocker="y"
+    elif [ -f /proc/1/cgroup ] && grep -q docker /proc/1/cgroup; then
+        echo "running on Docker"
+        isDocker="y"
+    elif [ -f /proc/self/cgroup ] && grep -q docker /proc/self/cgroup; then
+        echo "running on Docker"
+        isDocker="y"
+    else
+        isDocker="n"
+    fi
+}
+
+Check_WSL
+Check_Docker
+
 Manage_Service()
 {
     local Name=$1
@@ -42,7 +69,7 @@ Manage_Service()
         return
     fi
 
-    if [ "${isWSL}" != "y" ] && command -v systemctl >/dev/null 2>&1 && [[ -s /etc/systemd/system/${Name}.service || -s /lib/systemd/system/${Name}.service || -s /usr/lib/systemd/system/${Name}.service ]]; then
+    if [ "${isWSL}" = "n" ] && [ "${isDocker}" = "n" ] && command -v systemctl >/dev/null 2>&1 && [[ -s /etc/systemd/system/${Name}.service || -s /lib/systemd/system/${Name}.service || -s /usr/lib/systemd/system/${Name}.service ]]; then
         systemctl ${SAction} ${Name}
     else
         /etc/init.d/${Name} ${Action}
