@@ -1317,7 +1317,7 @@ eof
     \cp p.php ${Default_Website_Dir}/p.php
 
     \cp ${cur_dir}/conf/index.html ${Default_Website_Dir}/index.html
-    \cp ${cur_dir}/conf/lnmp.gif ${Default_Website_Dir}/lnmp.gif
+    # \cp ${cur_dir}/conf/lnmp.gif ${Default_Website_Dir}/lnmp.gif
 
     if [ ${PHPSelect} -ge 4 ]; then
         echo "Copy Opcache Control Panel..."
