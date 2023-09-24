@@ -1,0 +1,65 @@
+name: Build LNMP Docker Image
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Docker Image Tag'
+        default: 'nginx-mysql57-php74'
+        type: string
+        required: true
+      command:
+        description: 'LNMP Auto-install Command (Base64 Format)'
+        # Example: echo 'LNMP_Auto="y" DBSelect="4" Bin="y" DB_Root_Password="root" InstallInnodb="y" PHPSelect="10" SelectMalloc="2" timeout 20m ./install.sh lnmp' | base64 -w 0
+        default: 'IyEvYmluL2Jhc2gKTE5NUF9BdXRvPSJ5IiBEQlNlbGVjdD0iNCIgQmluPSJ5IiBEQl9Sb290X1Bhc3N3b3JkPSJyb290IiBJbnN0YWxsSW5ub2RiPSJ5IiBQSFBTZWxlY3Q9IjEwIiBTZWxlY3RNYWxsb2M9IjIiIHRpbWVvdXQgMjBtIC4vaW5zdGFsbC5zaCBsbm1wCmVjaG8gfCAuL2FkZG9ucy5zaCBpbnN0YWxsIG9wY2FjaGU='
+        type: string
+        required: true
+      debug_enabled:
+        type: boolean
+        description: 'Run the build with tmate debugging enabled'
+        required: false
+        default: false
+
+jobs:
+  build_images:
+    name: Build Image
+    runs-on: ubuntu-latest
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v4
+      -
+        name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
+      # -
+      #   name: Set up QEMU
+      #   uses: docker/setup-qemu-action@v3
+      -
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          driver-opts: env.BUILDKIT_STEP_LOG_MAX_SIZE=10485760
+      -
+        name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      # -
+      #   name: Log in to the Github Container registry
+      #   uses: docker/login-action@v3
+      #   with:
+      #     registry: ghcr.io
+      #     username: ${{ github.actor }}
+      #     password: ${{ secrets.GITHUB_TOKEN }}
+      -
+        name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          push: true
+          context: .
+          build-args: |
+            AUTOCMD=${{ github.event.inputs.command }}
+          platforms: linux/amd64
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/lnmp:${{ github.event.inputs.tag }}
