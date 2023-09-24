@@ -4,13 +4,13 @@ on:
     inputs:
       tag:
         description: 'Docker Image Tag'
-        default: 'nginx-mysql57-php74'
+        default: 'nginx-php74'
         type: string
         required: true
       command:
         description: 'LNMP Auto-install Command (Base64 Format)'
         # Example: echo 'LNMP_Auto="y" DBSelect="4" Bin="y" DB_Root_Password="root" InstallInnodb="y" PHPSelect="10" SelectMalloc="2" timeout 20m ./install.sh lnmp' | base64 -w 0
-        default: 'IyEvYmluL2Jhc2gKTE5NUF9BdXRvPSJ5IiBEQlNlbGVjdD0iNCIgQmluPSJ5IiBEQl9Sb290X1Bhc3N3b3JkPSJyb290IiBJbnN0YWxsSW5ub2RiPSJ5IiBQSFBTZWxlY3Q9IjEwIiBTZWxlY3RNYWxsb2M9IjIiIHRpbWVvdXQgMjBtIC4vaW5zdGFsbC5zaCBsbm1wCmVjaG8gfCAuL2FkZG9ucy5zaCBpbnN0YWxsIG9wY2FjaGU='
+        default: 'IyEvYmluL2Jhc2gNCkxOTVBfQXV0bz0ieSIgREJTZWxlY3Q9IjAiIFBIUFNlbGVjdD0iMTAiIFNlbGVjdE1hbGxvYz0iMiIgdGltZW91dCAyMG0gLi9pbnN0YWxsLnNoIGxubXA7DQplY2hvIHwgLi9hZGRvbnMuc2ggaW5zdGFsbCBvcGNhY2hlOw0KbWtkaXIgLXAgL3Vzci9sb2NhbC9yZWRpcy9iaW47DQplY2hvICcgJyA+IC91c3IvbG9jYWwvcmVkaXMvYmluL3JlZGlzLXNlcnZlcjsNCnNlZCAtaS5iYWsgJy9pbml0LmQucmVkaXMvLCs3ZCcgaW5jbHVkZS9yZWRpcy5zaDsNCmVjaG8gfCAuL2FkZG9ucy5zaCBpbnN0YWxsIHJlZGlzOw0KbXYgLWYgaW5jbHVkZS9yZWRpcy5zaC5iYWsgaW5jbHVkZS9yZWRpcy5zaDs='
         type: string
         required: true
       debug_enabled:

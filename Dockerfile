@@ -13,7 +13,7 @@ RUN set -ex && \
   rm -rf /var/lib/apt/lists/* && \
   rm -rf /root/lnmp/src/*-*
 
-VOLUME ["/home/wwwroot", "/home/wwwlogs", "/usr/local/mysql/var", "/usr/local/nginx/conf", "/etc/my.cnf.d"]
+VOLUME ["/home/wwwroot", "/home/wwwlogs", "/usr/local/nginx/conf"]
 
 EXPOSE 80 443 3306
 
