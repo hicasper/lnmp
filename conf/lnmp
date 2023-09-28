@@ -248,6 +248,8 @@ server
         # openssl dhparam -out /usr/local/nginx/conf/ssl/dhparam.pem 2048
         #SSL#ssl_dhparam /usr/local/nginx/conf/ssl/dhparam.pem;
 
+        #301REDIR#if (\$scheme = http) { return  301 https://\$host\$request_uri; }
+
         include rewrite/${rewrite}.conf;
         #error_page   404   /404.html;
 
@@ -1153,7 +1155,7 @@ Return_301_Menu()
     Echo_Yellow "Using 301 to Redirect HTTP to HTTPS? (y/n) "
     read using_301
     if [[ "${using_301}" == "n" || "${using_301}" == "" ]]; then
-        echo "DO not setting 301 Redirect."
+        echo "Do not setting 301 Redirect."
     elif [ "${using_301}" == "y" ]; then
         echo "Redirect http://${domain} to https://${domain} "
     fi
@@ -1303,8 +1305,9 @@ Create_SSL_Config()
     sed -i "s|#SSLKEY#|$ssl_certificate_key|g" /usr/local/nginx/conf/vhost/${domain}.conf
 
     if [ "${using_301}" == "y" ]; then
-        sed -i '0,/access_log/!b;//i\        location / {\n            return 301 https://$host$request_uri;\n        }\n' /usr/local/nginx/conf/vhost/${domain}.conf
-        sed -i "0,/include rewrite\/${rewrite}.conf;/s//#include rewrite\/${rewrite}.conf;/" /usr/local/nginx/conf/vhost/${domain}.conf
+        sed -Ei 's|^([[:space:]]*)#301REDIR#|\1|' /usr/local/nginx/conf/vhost/${domain}.conf
+        #sed -i '0,/access_log/!b;//i\        location / {\n            return 301 https://$host$request_uri;\n        }\n' /usr/local/nginx/conf/vhost/${domain}.conf
+        #sed -i "0,/include rewrite\/${rewrite}.conf;/s//#include rewrite\/${rewrite}.conf;/" /usr/local/nginx/conf/vhost/${domain}.conf
     fi
 
     if [ "${enable_ipv6}" == "y" ]; then
