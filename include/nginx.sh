@@ -138,6 +138,10 @@ Install_Nginx()
     \cp conf/enable-php-pathinfo.conf /usr/local/nginx/conf/enable-php-pathinfo.conf
     \cp -ra conf/example /usr/local/nginx/conf/example
     \cp conf/realip.conf /usr/local/nginx/conf/realip.conf
+    mkdir -p /usr/local/nginx/conf/ssl/
+    \cp conf/ssl_empty.cer /usr/local/nginx/conf/ssl/empty.cer
+    \cp conf/ssl_empty.key /usr/local/nginx/conf/ssl/empty.key
+
     if [ "${Enable_Nginx_Lua}" = 'y' ]; then
         if ! grep -q 'lua_package_path "/usr/local/nginx/lib/lua/?.lua";' /usr/local/nginx/conf/nginx.conf; then
             sed -i "/server_tokens off;/i\        lua_package_path \"/usr/local/nginx/lib/lua/?.lua\";\n" /usr/local/nginx/conf/nginx.conf
