@@ -247,6 +247,9 @@ server
         #SSL#ssl_session_cache builtin:1000 shared:SSL:10m;
         # openssl dhparam -out /usr/local/nginx/conf/ssl/dhparam.pem 2048
         #SSL#ssl_dhparam /usr/local/nginx/conf/ssl/dhparam.pem;
+        # OCSP stapling
+        #SSL#ssl_stapling on;
+        #ssl_stapling_verify on;
 
         #301REDIR#if (\$scheme = http) { return  301 https://\$host\$request_uri; }
 
