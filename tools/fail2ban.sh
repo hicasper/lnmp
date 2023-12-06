@@ -31,10 +31,10 @@ fi
 
 echo "Downloading..."
 cd ../src
-Download_Files ${Download_Mirror}/security/fail2ban/fail2ban-1.0.3.tar.gz fail2ban-1.0.3.tar.gz
-tar zxf fail2ban-1.0.3.tar.gz && cd fail2ban-1.0.3
+Download_Files https://github.com/fail2ban/fail2ban/archive/refs/tags/1.1.0.tar.gz fail2ban-1.1.0.tar.gz
+tar zxf fail2ban-1.1.0.tar.gz && cd fail2ban-1.1.0
 echo "Installing fail2ban..."
-python3 setup.py install
+python3 setup.py install  --prefix=/usr
 
 echo "Copy configure file..."
 \cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local

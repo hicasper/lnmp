@@ -960,14 +960,11 @@ Install_Check_Acme.sh()
         fi
     else
         cd /tmp
-        [[ -f latest.tar.gz ]] && rm -f latest.tar.gz
-        wget https://soft.vpser.net/lib/acme.sh/latest.tar.gz --prefer-family=IPv4 --no-check-certificate
-        tar zxf latest.tar.gz
-        cd acme.sh-*
+        git clone https://github.com/acmesh-official/acme.sh.git
+        cd acme.sh
         ./acme.sh --install ${acme_sh_sudo} --log --home /usr/local/acme.sh --certhome /usr/local/nginx/conf/ssl -m ${email_address}
         cd ..
-        rm -f latest.tar.gz
-        rm -rf acme.sh-*
+        rm -rf acme.sh
         sed -i 's/cat "\$CERT_PATH"$/#cat "\$CERT_PATH"/g' /usr/local/acme.sh/acme.sh
         cat >/usr/local/acme.sh/upgrade.sh<<EOF
 #!/bin/bash

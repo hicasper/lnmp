@@ -39,13 +39,13 @@ Install_Only_Nginx()
     Modify_Source
     Nginx_Dependent
     cd ${cur_dir}/src
-    Download_Files ${Download_Mirror}/web/pcre/${Pcre_Ver}.tar.bz2 ${Pcre_Ver}.tar.bz2
+    Download_Files https://sourceforge.net/projects/pcre/files/pcre/8.45/${Pcre_Ver}.tar.bz2 ${Pcre_Ver}.tar.bz2
     Install_Pcre
     if [ `grep -L '/usr/local/lib'    '/etc/ld.so.conf'` ]; then
         echo "/usr/local/lib" >> /etc/ld.so.conf
     fi
     ldconfig
-    Download_Files ${Download_Mirror}/web/nginx/${Nginx_Ver}.tar.gz ${Nginx_Ver}.tar.gz
+    Download_Files https://nginx.org/download/${Nginx_Ver}.tar.gz ${Nginx_Ver}.tar.gz
     Install_Nginx
     StartUp nginx
     rm -rf ${cur_dir}/src/${Nginx_Ver}
@@ -135,7 +135,9 @@ Install_Database()
         if [[ "${Bin}" = "y" && "${DBSelect}" =~ ^[2-4]$ ]]; then
             Mysql_Ver_Short=$(echo ${Mysql_Ver} | sed 's/mysql-//' | cut -d. -f1-2)
             Download_Files https://cdn.mysql.com/Downloads/MySQL-${Mysql_Ver_Short}/${Mysql_Ver}-linux-glibc2.12-${DB_ARCH}.tar.gz ${Mysql_Ver}-linux-glibc2.12-${DB_ARCH}.tar.gz
-            [[ $? -ne 0 ]] && Download_Files https://cdn.mysql.com/archives/mysql-${Mysql_Ver_Short}/${Mysql_Ver}-linux-glibc2.12-${DB_ARCH}.tar.gz ${Mysql_Ver}-linux-glibc2.12-${DB_ARCH}.tar.gz
+            if [ $? -ne 0 ]; then
+                Download_Files https://cdn.mysql.com/archives/mysql-${Mysql_Ver_Short}/${Mysql_Ver}-linux-glibc2.12-${DB_ARCH}.tar.gz ${Mysql_Ver}-linux-glibc2.12-${DB_ARCH}.tar.gz
+            fi
             if [ ! -s ${Mysql_Ver}-linux-glibc2.12-${DB_ARCH}.tar.gz ]; then
                 Echo_Red "Error! Unable to download MySQL ${Mysql_Ver_Short} Generic Binaries, please download it to src directory manually."
                 sleep 5
@@ -159,7 +161,11 @@ Install_Database()
                 exit 1
             fi
         else
-            Download_Files ${Download_Mirror}/datebase/mysql/${Mysql_Ver}.tar.gz ${Mysql_Ver}.tar.gz
+		    Mysql_Ver_Short=$(echo ${Mysql_Ver} | sed 's/mysql-//' | cut -d. -f1-2)
+            Download_Files https://cdn.mysql.com/Downloads/MySQL-${Mysql_Ver_Short}/${Mysql_Ver}.tar.gz ${Mysql_Ver}.tar.gz
+            if [ $? -ne 0 ]; then
+                Download_Files https://cdn.mysql.com/archives/mysql-${Mysql_Ver_Short}/${Mysql_Ver}.tar.gz ${Mysql_Ver}.tar.gz
+            fi
             if [ ! -s ${Mysql_Ver}.tar.gz ]; then
                 Echo_Red "Error! Unable to download MySQL source code, please download it to src directory manually."
                 sleep 5
@@ -167,17 +173,32 @@ Install_Database()
             fi
         fi
     elif [[ "${DBSelect}" =~ ^[6789]|10$ ]]; then
-        Mariadb_Version=$(echo ${Mariadb_Ver} | cut -d- -f2)
+        Mariadb_Version_Short=$(echo ${Mariadb_Ver} | cut -d- -f2)
         if [ "${Bin}" = "y" ]; then
             MariaDB_FileName="${Mariadb_Ver}-linux-systemd-${DB_ARCH}"
+            if [ "${country}" = "CN" ]; then
+                Download_Files https://mirrors.ustc.edu.cn/mariadb/${Mariadb_Ver}/bintar-linux-systemd-x86_64/${Mariadb_Ver}-linux-systemd-x86_64.tar.gz ${Mariadb_Ver}-linux-systemd-x86_64.tar.gz
+                if [ $? -ne 0 ]; then
+                    Download_Files https://archive.mariadb.org/${Mariadb_Ver}/bintar-linux-systemd-x86_64/${Mariadb_Ver}-linux-systemd-x86_64.tar.gz ${Mariadb_Ver}-linux-systemd-x86_64.tar.gz
+                fi
+            else
+                Download_Files https://downloads.mariadb.org/rest-api/mariadb/${Mariadb_Version_Short}/${Mariadb_Ver}-linux-systemd-x86_64.tar.gz ${Mariadb_Ver}-linux-systemd-x86_64.tar.gz
+                if [ $? -ne 0 ]; then
+                    Download_Files https://archive.mariadb.org/${Mariadb_Ver}/bintar-linux-systemd-x86_64/${Mariadb_Ver}-linux-systemd-x86_64.tar.gz ${Mariadb_Ver}-linux-systemd-x86_64.tar.gz
+                fi
+            fi
         else
-            MariaDB_FileName="${Mariadb_Ver}"
-        fi
-        Download_Files https://downloads.mariadb.org/rest-api/mariadb/${Mariadb_Version}/${MariaDB_FileName}.tar.gz ${MariaDB_FileName}.tar.gz
-        if [ ! -s ${MariaDB_FileName}.tar.gz ]; then
-            Echo_Red "Error! Unable to download MariaDB, please download it to src directory manually."
-            sleep 5
-            exit 1
+            if [ "${country}" = "CN" ]; then
+                Download_Files https://mirrors.ustc.edu.cn/mariadb/${Mariadb_Ver}/source/${Mariadb_Ver}.tar.gz ${Mariadb_Ver}.tar.gz
+                if [ $? -ne 0 ]; then
+            	    Download_Files https://archive.mariadb.org/${Mariadb_Ver}/source/${Mariadb_Ver}.tar.gz ${Mariadb_Ver}.tar.gz
+                fi
+            else
+                Download_Files https://downloads.mariadb.org/rest-api/mariadb/${Mariadb_Version_Short}/${Mariadb_Ver}.tar.gz ${Mariadb_Ver}.tar.gz
+                if [ $? -ne 0 ]; then
+            	    Download_Files https://archive.mariadb.org/${Mariadb_Ver}/source/${Mariadb_Ver}.tar.gz ${Mariadb_Ver}.tar.gz
+                fi
+            fi
         fi
     fi
     echo "============================check files=================================="

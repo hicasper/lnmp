@@ -861,7 +861,6 @@ Print_Sys_Info()
     Check_WSL
     Check_Docker
     if [ "${CheckMirror}" != "n" ]; then
-        Get_Country
         echo "Server Location: ${country}"
     fi
 }
@@ -899,78 +898,6 @@ Remove_StartUp()
             chkconfig --del ${init_name}
         elif [ "$PM" = "apt" ]; then
             update-rc.d -f ${init_name} remove
-        fi
-    fi
-}
-
-Get_Country()
-{
-    if command -v curl >/dev/null 2>&1; then
-        country=`curl -sSk --connect-timeout 30 -m 60 http://ip.vpszt.com/country`
-        if [ $? -ne 0 ]; then
-            country=`curl -sSk --connect-timeout 30 -m 60 https://ip.vpser.net/country`
-        fi
-    else
-        country=`wget --timeout=5 --no-check-certificate -q -O - http://ip.vpszt.com/country`
-    fi
-}
-
-Check_Mirror()
-{
-    if ! command -v curl >/dev/null 2>&1; then
-        if [ "$PM" = "yum" ]; then
-            yum install -y curl
-        elif [ "$PM" = "apt" ]; then
-            export DEBIAN_FRONTEND=noninteractive
-            apt-get update
-            apt-get install -y curl
-        fi
-    fi
-    if [ "${Download_Mirror}" = "https://soft.vpser.net" ]; then
-        echo "Try http://soft.vpser.net ..."
-        mirror_code=`curl -o /dev/null -m 20 --connect-timeout 20 -sk -w %{http_code} http://soft.vpser.net`
-        if [[ "${mirror_code}" = "200" || "${mirror_code}" = "302" ]]; then
-            echo "http://soft.vpser.net http code: ${mirror_code}"
-            ping -c 3 soft.vpser.net
-        else
-            ping -c 3 soft.vpser.net
-            if [ "${country}" = "CN" ]; then
-                echo "Try http://soft1.vpser.net ..."
-                mirror_code=`curl -o /dev/null -m 20 --connect-timeout 20 -sk -w %{http_code} http://soft1.vpser.net`
-                if [[ "${mirror_code}" = "200" || "${mirror_code}" = "302" ]]; then
-                    echo "Change to mirror http://soft1.vpser.net"
-                    Download_Mirror='http://soft1.vpser.net'
-                else
-                    echo "Try http://soft2.vpser.net ..."
-                    mirror_code=`curl -o /dev/null -m 20 --connect-timeout 20 -sk -w %{http_code} http://soft2.vpser.net`
-                    if [[ "${mirror_code}" = "200" || "${mirror_code}" = "302" ]]; then
-                        echo "Change to mirror http://soft2.vpser.net"
-                        Download_Mirror='http://soft2.vpser.net'
-                    else
-                        echo "Can not connect to download mirror,Please modify lnmp.conf manually."
-                        echo "More info,please visit https://lnmp.org/faq/download-url.html"
-                        exit 1
-                    fi
-                fi
-            else
-                echo "Try http://soft2.vpser.net ..."
-                mirror_code=`curl -o /dev/null -m 20 --connect-timeout 20 -sk -w %{http_code} http://soft2.vpser.net`
-                if [[ "${mirror_code}" = "200" || "${mirror_code}" = "302" ]]; then
-                    echo "Change to mirror http://soft2.vpser.net"
-                    Download_Mirror='http://soft2.vpser.net'
-                else
-                    echo "Try http://soft1.vpser.net ..."
-                    mirror_code=`curl -o /dev/null -m 20 --connect-timeout 20 -sk -w %{http_code} http://soft1.vpser.net`
-                    if [[ "${mirror_code}" = "200" || "${mirror_code}" = "302" ]]; then
-                        echo "Change to mirror http://soft1.vpser.net"
-                        Download_Mirror='http://soft1.vpser.net'
-                    else
-                        echo "Can not connect to download mirror,Please modify lnmp.conf manually."
-                        echo "More info,please visit https://lnmp.org/faq/download-url.html"
-                        exit 1
-                    fi
-                fi
-            fi
         fi
     fi
 }

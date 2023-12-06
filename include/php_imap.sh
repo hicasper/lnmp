@@ -27,8 +27,8 @@ Install_PHP_Imap()
                 if [ "${CheckMirror}" = "n" ]; then
                     rpm -ivh ${cur_dir}/src/libc-client-2007f-24.el9.${ARCH}.rpm ${cur_dir}/src/uw-imap-devel-2007f-24.el9.${ARCH}.rpm
                 else
-                    rpm -ivh ${Download_Mirror}/lib/uw-imap/libc-client-2007f-24.el9.${ARCH}.rpm
-                    rpm -ivh ${Download_Mirror}/lib/uw-imap/uw-imap-devel-2007f-24.el9.${ARCH}.rpm
+                    rpm -ivh https://rpmfind.net/linux/remi/enterprise/9/remi/${ARCH}/libc-client-2007f-30.el9.remi.${ARCH}.rpm
+                    rpm -ivh https://rpmfind.net/linux/remi/enterprise/9/remi/${ARCH}/uw-imap-devel-2007f-30.el9.remi.${ARCH}.rpm
                 fi
             fi
         fi

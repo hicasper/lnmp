@@ -147,8 +147,8 @@ Install_Multiplephp()
 Install_MPHP5.2()
 {
     cd ${cur_dir}/src
-    Download_Files ${Download_Mirror}/web/php/${Php_Ver}.tar.bz2 ${Php_Ver}.tar.bz2
-    Download_Files ${Download_Mirror}/web/phpfpm/php-5.2.17-fpm-0.5.14.diff.gz php-5.2.17-fpm-0.5.14.diff.gz
+    Download_Files https://museum.php.net/php5/${Php_Ver}.tar.bz2 ${Php_Ver}.tar.bz2
+    Download_Files https://php-fpm.org/downloads/php-5.2.17-fpm-0.5.14.diff.gz php-5.2.17-fpm-0.5.14.diff.gz
 
     lnmp stop
 
@@ -239,7 +239,7 @@ Install_MPHP5.3()
     lnmp stop
 
     cd ${cur_dir}/src
-    Download_Files ${Download_Mirror}/web/php/${Php_Ver}.tar.bz2 ${Php_Ver}.tar.bz2
+    Download_Files https://museum.php.net/php5/${Php_Ver}.tar.bz2 ${Php_Ver}.tar.bz2
     Echo_Blue "[+] Installing ${Php_Ver}..."
     Tar_Cd ${Php_Ver}.tar.bz2 ${Php_Ver}
     patch -p1 < ${cur_dir}/src/patch/php-5.3-multipart-form-data.patch
@@ -338,7 +338,7 @@ Install_MPHP5.4()
     lnmp stop
 
     cd ${cur_dir}/src
-    Download_Files ${Download_Mirror}/web/php/${Php_Ver}.tar.bz2 ${Php_Ver}.tar.bz2
+    Download_Files https://museum.php.net/php5/${Php_Ver}.tar.bz2 ${Php_Ver}.tar.bz2
     Echo_Blue "[+] Installing ${Php_Ver}..."
     Tar_Cd ${Php_Ver}.tar.bz2 ${Php_Ver}
     ./configure --prefix=${MPHP_Path} --with-config-file-path=${MPHP_Path}/etc --with-config-file-scan-dir=${MPHP_Path}/conf.d --enable-fpm --with-fpm-user=www --with-fpm-group=www --with-mysql=mysqlnd --with-mysqli=mysqlnd --with-pdo-mysql=mysqlnd --with-iconv-dir --with-freetype-dir=/usr/local/freetype --with-jpeg-dir --with-png-dir --with-zlib --with-libxml-dir=/usr --enable-xml --disable-rpath --enable-bcmath --enable-shmop --enable-sysvsem --enable-inline-optimization ${with_curl} --enable-mbregex --enable-mbstring --with-mcrypt --enable-ftp --with-gd --enable-gd-native-ttf ${with_openssl} --with-mhash --enable-pcntl --enable-sockets --with-xmlrpc --enable-zip --enable-soap --with-gettext ${with_fileinfo} --enable-intl --with-xsl ${PHP_Buildin_Option} ${PHP_Modules_Options}
@@ -434,7 +434,7 @@ Install_MPHP5.5()
     lnmp stop
 
     cd ${cur_dir}/src
-    Download_Files ${Download_Mirror}/web/php/${Php_Ver}.tar.bz2 ${Php_Ver}.tar.bz2
+    Download_Files https://museum.php.net/php5/${Php_Ver}.tar.bz2 ${Php_Ver}.tar.bz2
     Echo_Blue "[+] Installing ${Php_Ver}..."
     Tar_Cd ${Php_Ver}.tar.bz2 ${Php_Ver}
     if [ "${ARCH}" = "aarch64" ]; then
@@ -533,7 +533,7 @@ Install_MPHP5.6()
     lnmp stop
 
     cd ${cur_dir}/src
-    Download_Files ${Download_Mirror}/web/php/${Php_Ver}.tar.bz2 ${Php_Ver}.tar.bz2
+    Download_Files https://museum.php.net/php5/${Php_Ver}.tar.bz2 ${Php_Ver}.tar.bz2
     Echo_Blue "[+] Installing ${Php_Ver}"
     Tar_Cd ${Php_Ver}.tar.bz2 ${Php_Ver}
     if [ "${ARCH}" = "aarch64" ]; then
@@ -635,7 +635,7 @@ Install_MPHP7.0()
     lnmp stop
 
     cd ${cur_dir}/src
-    Download_Files ${Download_Mirror}/web/php/${Php_Ver}.tar.bz2 ${Php_Ver}.tar.bz2
+    Download_Files https://www.php.net/distributions/${Php_Ver}.tar.bz2 ${Php_Ver}.tar.bz2
     Echo_Blue "[+] Installing ${Php_Ver}"
     Tar_Cd ${Php_Ver}.tar.bz2 ${Php_Ver}
     if command -v pkg-config >/dev/null 2>&1 && pkg-config --modversion icu-i18n | grep -Eqi '^6[1-9]|[7-9][0-9]'; then
@@ -719,7 +719,7 @@ Install_MPHP7.1()
     lnmp stop
 
     cd ${cur_dir}/src
-    Download_Files ${Download_Mirror}/web/php/${Php_Ver}.tar.bz2 ${Php_Ver}.tar.bz2
+    Download_Files https://www.php.net/distributions/${Php_Ver}.tar.bz2 ${Php_Ver}.tar.bz2
     Echo_Blue "[+] Installing ${Php_Ver}"
     Tar_Cd ${Php_Ver}.tar.bz2 ${Php_Ver}
     PHP_Openssl3_Patch
@@ -802,7 +802,7 @@ Install_MPHP7.2()
     lnmp stop
 
     cd ${cur_dir}/src
-    Download_Files ${Download_Mirror}/web/php/${Php_Ver}.tar.bz2 ${Php_Ver}.tar.bz2
+    Download_Files https://www.php.net/distributions/${Php_Ver}.tar.bz2 ${Php_Ver}.tar.bz2
     Echo_Blue "[+] Installing ${Php_Ver}"
     Tar_Cd ${Php_Ver}.tar.bz2 ${Php_Ver}
     PHP_Openssl3_Patch
@@ -885,7 +885,7 @@ Install_MPHP7.3()
     lnmp stop
 
     cd ${cur_dir}/src
-    Download_Files ${Download_Mirror}/web/php/${Php_Ver}.tar.bz2 ${Php_Ver}.tar.bz2
+    Download_Files https://www.php.net/distributions/${Php_Ver}.tar.bz2 ${Php_Ver}.tar.bz2
     Echo_Blue "[+] Installing ${Php_Ver}"
     Tar_Cd ${Php_Ver}.tar.bz2 ${Php_Ver}
     PHP_Openssl3_Patch
@@ -968,7 +968,7 @@ Install_MPHP7.4()
     lnmp stop
 
     cd ${cur_dir}/src
-    Download_Files ${Download_Mirror}/web/php/${Php_Ver}.tar.bz2 ${Php_Ver}.tar.bz2
+    Download_Files https://www.php.net/distributions/${Php_Ver}.tar.bz2 ${Php_Ver}.tar.bz2
     Install_Libzip
     Echo_Blue "[+] Installing ${Php_Ver}"
     Tar_Cd ${Php_Ver}.tar.bz2 ${Php_Ver}
@@ -1051,7 +1051,7 @@ Install_MPHP8.0()
     lnmp stop
 
     cd ${cur_dir}/src
-    Download_Files ${Download_Mirror}/web/php/${Php_Ver}.tar.bz2 ${Php_Ver}.tar.bz2
+    Download_Files https://www.php.net/distributions/${Php_Ver}.tar.bz2 ${Php_Ver}.tar.bz2
     Install_Libzip
     Echo_Blue "[+] Installing ${Php_Ver}"
     Tar_Cd ${Php_Ver}.tar.bz2 ${Php_Ver}
@@ -1134,7 +1134,7 @@ Install_MPHP8.1()
     lnmp stop
 
     cd ${cur_dir}/src
-    Download_Files ${Download_Mirror}/web/php/${Php_Ver}.tar.bz2 ${Php_Ver}.tar.bz2
+    Download_Files https://www.php.net/distributions/${Php_Ver}.tar.bz2 ${Php_Ver}.tar.bz2
     Install_Libzip
     Echo_Blue "[+] Installing ${Php_Ver}"
     Tar_Cd ${Php_Ver}.tar.bz2 ${Php_Ver}
@@ -1216,7 +1216,7 @@ Install_MPHP8.2()
     lnmp stop
 
     cd ${cur_dir}/src
-    Download_Files ${Download_Mirror}/web/php/${Php_Ver}.tar.bz2 ${Php_Ver}.tar.bz2
+    Download_Files https://www.php.net/distributions/${Php_Ver}.tar.bz2 ${Php_Ver}.tar.bz2
     Install_Libzip
     Echo_Blue "[+] Installing ${Php_Ver}"
     Tar_Cd ${Php_Ver}.tar.bz2 ${Php_Ver}

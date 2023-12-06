@@ -147,8 +147,8 @@ PHP_with_Imap()
                     if [ "${CheckMirror}" = "n" ]; then
                         rpm -ivh ${cur_dir}/src/libc-client-2007f-24.el9.${ARCH}.rpm ${cur_dir}/src/uw-imap-devel-2007f-24.el9.${ARCH}.rpm
                     else
-                        rpm -ivh ${Download_Mirror}/lib/uw-imap/libc-client-2007f-24.el9.${ARCH}.rpm
-                        rpm -ivh ${Download_Mirror}/lib/uw-imap/uw-imap-devel-2007f-24.el9.${ARCH}.rpm
+                        rpm -ivh https://rpmfind.net/linux/remi/enterprise/9/remi/${ARCH}/libc-client-2007f-30.el9.remi.${ARCH}.rpm
+                        rpm -ivh https://rpmfind.net/linux/remi/enterprise/9/remi/${ARCH}/uw-imap-devel-2007f-30.el9.remi.${ARCH}.rpm
                     fi
                 fi
             fi
@@ -211,17 +211,12 @@ Install_Composer()
     if [ "${CheckMirror}" != "n" ]; then
         echo "Downloading Composer..."
         if echo "${PHPSelect}" | grep -Eqi '^[1-8]' || echo "${php_version}" | grep -Eqi '^5.[2-6].*|7.[0-2].*' || echo "${Php_Ver}" | grep -Eqi "php-5.[2-6].*|php-7.[0-2].*"; then
-            wget --progress=dot:giga --prefer-family=IPv4 --no-check-certificate -T 120 -t3 ${Download_Mirror}/web/php/composer/composer-2.2.phar -O /usr/local/bin/composer
-            if [ $? -eq 0 ]; then
-                echo "Composer install successfully."
-                chmod +x /usr/local/bin/composer
-            else
-                echo "Composer install failed, try to from composer official website..."
                 curl -sS --connect-timeout 30 -m 60 https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer --2.2
                 if [ $? -eq 0 ]; then
                     echo "Composer install successfully."
+				else
+				    echo "Composer install failed."
                 fi
-            fi
         else
             wget --progress=dot:giga --prefer-family=IPv4 --no-check-certificate -T 120 -t3 https://mirrors.aliyun.com/composer/composer.phar -O /usr/local/bin/composer
             if [ $? -eq 0 ]; then

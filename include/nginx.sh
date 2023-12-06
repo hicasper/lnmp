@@ -8,12 +8,12 @@ Install_Nginx_Openssl()
         fi
         Nginx_Ver_Com=$(${cur_dir}/include/version_compare 1.13.0 ${Nginx_Version})
         if [[ "${Nginx_Ver_Com}" == "0" ||  "${Nginx_Ver_Com}" == "1" ]]; then
-            Download_Files ${Download_Mirror}/lib/openssl/${Openssl_Ver}.tar.gz ${Openssl_Ver}.tar.gz
+            Download_Files https://www.openssl.org/source/${Openssl_Ver}.tar.gz ${Openssl_Ver}.tar.gz
             [[ -d "${Openssl_Ver}" ]] && rm -rf ${Openssl_Ver}
             tar zxf ${Openssl_Ver}.tar.gz
             Nginx_With_Openssl="--with-openssl=${cur_dir}/src/${Openssl_Ver}"
         else
-            Download_Files ${Download_Mirror}/lib/openssl/${Openssl_New_Ver}.tar.gz ${Openssl_New_Ver}.tar.gz
+            Download_Files https://www.openssl.org/source/${Openssl_New_Ver}.tar.gz ${Openssl_New_Ver}.tar.gz
             [[ -d "${Openssl_New_Ver}" ]] && rm -rf ${Openssl_New_Ver}
             tar zxf ${Openssl_New_Ver}.tar.gz
             Nginx_With_Openssl="--with-openssl=${cur_dir}/src/${Openssl_New_Ver} --with-openssl-opt='enable-weak-ssl-ciphers'"
@@ -72,7 +72,7 @@ EOF
             if [ "${Nginx_With_Pcre}" = "" ]; then
                 Nginx_Module_Lua="--with-ld-opt=-Wl,-rpath,/usr/local/luajit/lib --add-module=${cur_dir}/src/${LuaNginxModule} --add-module=${cur_dir}/src/${NgxDevelKit} --with-pcre=${cur_dir}/src/${Pcre_Ver} --with-pcre-jit"
                 cd ${cur_dir}/src
-                Download_Files ${Download_Mirror}/web/pcre/${Pcre_Ver}.tar.bz2 ${Pcre_Ver}.tar.bz2
+                Download_Files https://sourceforge.net/projects/pcre/files/pcre/8.45/${Pcre_Ver}.tar.bz2 ${Pcre_Ver}.tar.bz2
                 Tar_Cd ${Pcre_Ver}.tar.bz2
             else
                 Nginx_Module_Lua="--with-ld-opt=-Wl,-rpath,/usr/local/luajit/lib --add-module=${cur_dir}/src/${LuaNginxModule} --add-module=${cur_dir}/src/${NgxDevelKit}"

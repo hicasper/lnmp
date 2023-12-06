@@ -1,8 +1,17 @@
-# LNMP一键安装包 - Readme
+# LNMP一键安装包 魔改版 - Readme
 
 ## LNMP一键安装包是什么?
 
 LNMP一键安装包是一个用Linux Shell编写的可以为CentOS/RHEL/Fedora/Debian/Ubuntu/Raspbian/Deepin/Alibaba/Amazon/Mint/Oracle/Rocky/Alma/Kali/UOS/银河麒麟/openEuler/Anolis OS Linux VPS或独立主机安装LNMP(Nginx/MySQL/PHP)、LNMPA(Nginx/MySQL/PHP/Apache)、LAMP(Apache/MySQL/PHP)生产环境的Shell程序。
+
+## 魔改版和原版有什么区别？
+
+* 删除下载镜像，所有软件包均从软件官方镜像获取。去除所有与以下域名有关的操作："lnmp.com"、"lnmp.org"、"vpser.net"、"vpser*.net"、"vpszt.net"
+* 由于去除的lnmp.org的下载镜像，中国大陆用户不友好请自行解决。
+* 去除了自动获取服务器所在地，相关设置移动至lnmp.conf > " country='US' " 默认US。大陆用户可以修改将US为CN，mariadb将从USTC镜像获取。
+* 由于去除了下载镜像，SourceGuardian以及ionCube安装失效，如有需求可以通过修改lnmp.conf中" Download_Mirror='https://soft.vpser.net' "恢复lnmp.org下载镜像即可安装。
+* Nginx Lua以及Zend无法在线获取，可以在release下载自带lua以及zend的包安装。
+* 虽然并没有修改脚本的逻辑，但是使用魔改版请不要去 https://bbs.vpser.net/forum-25-1.html 反馈。
 
 ## LNMP一键安装包有哪些功能？
 
@@ -15,9 +24,9 @@ LNMP一键安装包是一个用Linux Shell编写的可以为CentOS/RHEL/Fedora/D
 
 ## LNMP安装
 
-安装前确认已经安装wget命令，如提示wget: command not found ，使用`yum install wget` 或 `apt-get install wget` 命令安装。
+安装前确认已经安装git命令，如提示git: command not found ，使用`yum install git` 或 `apt-get install git` 命令安装。
 为防止掉线等情况，建议使用screen，可以先执行：screen -S lnmp 命令后，再执行LNMP安装命令：
-`wget http://soft.lnmp.com/lnmp/lnmp2.1.tar.gz -cO lnmp2.1.tar.gz && tar zxf lnmp2.1.tar.gz && cd lnmp2.1 && ./install.sh {lnmp|lnmpa|lamp}`
+`git clone https://github.com/hicasper/lnmp.git && cd lnmp && ./install.sh {lnmp|lnmpa|lamp}`
 
 如断线可使用`screen -r lnmp` 恢复。**详细安装教程参考：<https://lnmp.org/install.html>**
 
@@ -52,7 +61,7 @@ lnmp.conf配置文件，可以修改lnmp.conf自定义下载服务器地址、�
 * 参数: memcached 可选择php-memcache或php-memcached扩展。
 * 参数: opcache 可访问 http://yourIP/ocp.php 进行管理。
 * 参数: eaccelerator 安装。
-* 参数: apcu 安装apcu php扩展，支持php7，可访问 http://yourIP/apc.php 进行管理。 
+* 参数: apcu 安装apcu php扩展，支持php7，可访问 http://yourIP/apc.php 进行管理。
 **请勿安装多个缓存类扩展模块，多个可能导致网站出现问题 ！**
 #### PHP组件/模块：
 * 参数：exif   图片exif信息读取模块。
@@ -181,7 +190,7 @@ MySQL 8.4 | 11 | PHP 8.0 | 11 | | | |
 ### lnmp.conf 配置文件参数说明
 
 | 参数名称 | 参数介绍 | 例子 |
-| :-------: | :---------: | :--------: | 
+| :-------: | :---------: | :--------: |
 |Download_Mirror|下载镜像|一般默认，如异常可[修改下载镜像](https://lnmp.org/faq/download-url.html)|
 |Nginx_Modules_Options|添加Nginx模块或其他编译参数|--add-module=/第三方模块源码目录|
 |PHP_Modules_Options|添加PHP模块或编译参数|--enable-exif 有些模块需提前安装好依赖包|

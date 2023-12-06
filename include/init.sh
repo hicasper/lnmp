@@ -121,12 +121,16 @@ Check_Hosts()
         echo "127.0.0.1 localhost.localdomain localhost" >> /etc/hosts
     fi
     if [ "${CheckMirror}" != "n" ]; then
-        pingresult=`ping -c1 lnmp.org 2>&1`
+        pingresult=`ping -c1 cloudfalre.com 2>&1`
         echo "${pingresult}"
         if echo "${pingresult}" | grep -q "unknown host"; then
             echo "DNS...fail"
             echo "Writing nameserver to /etc/resolv.conf ..."
-            echo -e "nameserver 208.67.220.220\nnameserver 114.114.114.114" > /etc/resolv.conf
+            if [ "${country}" = "CN" ]; then
+                echo -e "nameserver 208.67.220.220\nnameserver 114.114.114.114" > /etc/resolv.conf
+			else
+                echo -e "nameserver 1.1.1.1\nnameserver 8.8.8.8" > /etc/resolv.conf
+			fi
         else
             echo "DNS...ok"
         fi
@@ -352,7 +356,7 @@ CentOS_Dependent()
     fi
 
     Echo_Blue "[+] Yum installing dependent packages..."
-    for packages in make cmake gcc gcc-c++ gcc-g77 kernel-headers glibc-headers flex bison file libtool libtool-libs autoconf patch wget crontabs libjpeg libjpeg-devel libjpeg-turbo-devel libpng libpng-devel libpng10 libpng10-devel gd gd-devel libxml2 libxml2-devel zlib zlib-devel glib2 glib2-devel unzip tar bzip2 bzip2-devel libzip-devel libevent libevent-devel ncurses ncurses-devel curl curl-devel libcurl libcurl-devel e2fsprogs e2fsprogs-devel krb5 krb5-devel libidn libidn-devel openssl openssl-devel pcre-devel gettext gettext-devel ncurses-devel gmp-devel pspell-devel unzip libcap diffutils ca-certificates net-tools libc-client-devel psmisc libXpm-devel git-core c-ares-devel libicu-devel libxslt libxslt-devel xz expat-devel libaio-devel rpcgen libtirpc-devel perl cyrus-sasl-devel sqlite-devel oniguruma-devel lsof re2c pkg-config libarchive hostname ncurses-libs numactl-devel libxcrypt libwebp-devel gnutls-devel initscripts iproute libxcrypt-compat;
+    for packages in make cmake gcc gcc-c++ gcc-g77 kernel-headers glibc-headers flex bison file libtool libtool-libs autoconf patch wget crontabs libjpeg libjpeg-devel libjpeg-turbo-devel libpng libpng-devel libpng10 libpng10-devel gd gd-devel libxml2 libxml2-devel zlib zlib-devel glib2 glib2-devel unzip tar bzip2 bzip2-devel libzip-devel libevent libevent-devel ncurses ncurses-devel curl curl-devel libcurl libcurl-devel e2fsprogs e2fsprogs-devel krb5 krb5-devel libidn libidn-devel openssl openssl-devel pcre-devel gettext gettext-devel ncurses-devel gmp-devel pspell-devel unzip libcap diffutils ca-certificates net-tools libc-client-devel psmisc libXpm-devel git-core c-ares-devel libicu-devel libxslt libxslt-devel xz expat-devel libaio-devel rpcgen libtirpc-devel perl cyrus-sasl-devel sqlite-devel oniguruma-devel lsof re2c pkg-config libarchive hostname ncurses-libs numactl-devel libxcrypt libwebp-devel gnutls-devel initscripts iproute libxcrypt-compat git;
     do yum -y install $packages; done
 
     yum -y update nss
@@ -462,18 +466,12 @@ Check_Download()
 {
     Echo_Blue "[+] Downloading files..."
     cd ${cur_dir}/src
-    Download_Files ${Download_Mirror}/web/libiconv/${Libiconv_Ver}.tar.gz ${Libiconv_Ver}.tar.gz
-    Download_Files ${Download_Mirror}/web/libmcrypt/${LibMcrypt_Ver}.tar.gz ${LibMcrypt_Ver}.tar.gz
-    Download_Files ${Download_Mirror}/web/mcrypt/${Mcypt_Ver}.tar.gz ${Mcypt_Ver}.tar.gz
-    Download_Files ${Download_Mirror}/web/mhash/${Mhash_Ver}.tar.bz2 ${Mhash_Ver}.tar.bz2
-    if [ "${SelectMalloc}" = "2" ]; then
-        Download_Files ${Download_Mirror}/lib/jemalloc/${Jemalloc_Ver}.tar.bz2 ${Jemalloc_Ver}.tar.bz2
-    elif [ "${SelectMalloc}" = "3" ]; then
-        Download_Files ${Download_Mirror}/lib/tcmalloc/${TCMalloc_Ver}.tar.gz ${TCMalloc_Ver}.tar.gz
-        Download_Files ${Download_Mirror}/lib/libunwind/${Libunwind_Ver}.tar.gz ${Libunwind_Ver}.tar.gz
-    fi
+    Download_Files https://ftp.gnu.org/gnu/libiconv/${Libiconv_Ver}.tar.gz ${Libiconv_Ver}.tar.gz
+    Download_Files https://sourceforge.net/projects/mcrypt/files/Libmcrypt/2.5.8/${LibMcrypt_Ver}.tar.gz ${LibMcrypt_Ver}.tar.gz
+    Download_Files https://sourceforge.net/projects/mcrypt/files/MCrypt/2.6.8/${Mcypt_Ver}.tar.gz ${Mcypt_Ver}.tar.gz
+    Download_Files https://sourceforge.net/projects/mhash/files/mhash/0.9.9.9/${Mhash_Ver}.tar.bz2 ${Mhash_Ver}.tar.bz2
     if [ "${Stack}" != "lamp" ]; then
-        Download_Files ${Download_Mirror}/web/nginx/${Nginx_Ver}.tar.gz ${Nginx_Ver}.tar.gz
+        Download_Files https://nginx.org/download/${Nginx_Ver}.tar.gz ${Nginx_Ver}.tar.gz
     fi
     if [[ "${DBSelect}" =~ ^[12345]|11$ ]]; then
         if [[ "${Bin}" = "y" && "${DBSelect}" =~ ^[2-4]$ ]]; then
@@ -494,27 +492,54 @@ Check_Download()
                 Download_Files https://cdn.mysql.com/archives/mysql-8.4/${Mysql_Ver}-linux-glibc2.17-${DB_ARCH}.tar.xz ${Mysql_Ver}-linux-glibc2.17-${DB_ARCH}.tar.xz
             fi
         else
-            Download_Files ${Download_Mirror}/datebase/mysql/${Mysql_Ver}.tar.gz ${Mysql_Ver}.tar.gz
+		    Mysql_Ver_Short=$(echo ${Mysql_Ver} | sed 's/mysql-//' | cut -d. -f1-2)
+            Download_Files https://cdn.mysql.com/Downloads/MySQL-${Mysql_Ver_Short}/${Mysql_Ver}.tar.gz ${Mysql_Ver}.tar.gz
+            if [ $? -ne 0 ]; then
+                Download_Files https://cdn.mysql.com/archives/mysql-${Mysql_Ver_Short}/${Mysql_Ver}.tar.gz ${Mysql_Ver}.tar.gz
+            fi
         fi
     elif [[ "${DBSelect}" =~ ^[6789]|10$ ]]; then
-        Mariadb_Version=$(echo ${Mariadb_Ver} | cut -d- -f2)
+        Mariadb_Version_Short=$(echo ${Mariadb_Ver} | cut -d- -f2)
         if [ "${Bin}" = "y" ]; then
             MariaDB_FileName="${Mariadb_Ver}-linux-systemd-${DB_ARCH}"
+            if [ "${country}" = "CN" ]; then
+                Download_Files https://mirrors.ustc.edu.cn/mariadb/${Mariadb_Ver}/bintar-linux-systemd-x86_64/${Mariadb_Ver}-linux-systemd-x86_64.tar.gz ${Mariadb_Ver}-linux-systemd-x86_64.tar.gz
+                if [ $? -ne 0 ]; then
+                    Download_Files https://archive.mariadb.org/${Mariadb_Ver}/bintar-linux-systemd-x86_64/${Mariadb_Ver}-linux-systemd-x86_64.tar.gz ${Mariadb_Ver}-linux-systemd-x86_64.tar.gz
+                fi
+            else
+                Download_Files https://downloads.mariadb.org/rest-api/mariadb/${Mariadb_Version_Short}/${Mariadb_Ver}-linux-systemd-x86_64.tar.gz ${Mariadb_Ver}-linux-systemd-x86_64.tar.gz
+                if [ $? -ne 0 ]; then
+                    Download_Files https://archive.mariadb.org/${Mariadb_Ver}/bintar-linux-systemd-x86_64/${Mariadb_Ver}-linux-systemd-x86_64.tar.gz ${Mariadb_Ver}-linux-systemd-x86_64.tar.gz
+                fi
+            fi
         else
-            MariaDB_FileName="${Mariadb_Ver}"
+            if [ "${country}" = "CN" ]; then
+                Download_Files https://mirrors.ustc.edu.cn/mariadb/${Mariadb_Ver}/source/${Mariadb_Ver}.tar.gz ${Mariadb_Ver}.tar.gz
+                if [ $? -ne 0 ]; then
+            	    Download_Files https://archive.mariadb.org/${Mariadb_Ver}/source/${Mariadb_Ver}.tar.gz ${Mariadb_Ver}.tar.gz
+                fi
+            else
+                Download_Files https://downloads.mariadb.org/rest-api/mariadb/${Mariadb_Version_Short}/${Mariadb_Ver}.tar.gz ${Mariadb_Ver}.tar.gz
+                if [ $? -ne 0 ]; then
+            	    Download_Files https://archive.mariadb.org/${Mariadb_Ver}/source/${Mariadb_Ver}.tar.gz ${Mariadb_Ver}.tar.gz
+                fi
+            fi
         fi
-        Download_Files https://downloads.mariadb.org/rest-api/mariadb/${Mariadb_Version}/${MariaDB_FileName}.tar.gz ${MariaDB_FileName}.tar.gz
     fi
-    Download_Files ${Download_Mirror}/web/php/${Php_Ver}.tar.bz2 ${Php_Ver}.tar.bz2
+    Download_Files https://www.php.net/distributions/${Php_Ver}.tar.bz2 ${Php_Ver}.tar.bz2
+    if [ $? -ne 0 ]; then
+        Download_Files https://museum.php.net/php5/${Php_Ver}.tar.bz2 ${Php_Ver}.tar.bz2
+    fi
     if [ ${PHPSelect} = "1" ]; then
-        Download_Files ${Download_Mirror}/web/phpfpm/${Php_Ver}-fpm-0.5.14.diff.gz ${Php_Ver}-fpm-0.5.14.diff.gz
+        Download_Files https://php-fpm.org/downloads/${Php_Ver}-fpm-0.5.14.diff.gz ${Php_Ver}-fpm-0.5.14.diff.gz
     fi
-    Download_Files ${Download_Mirror}/datebase/phpmyadmin/${PhpMyAdmin_Ver}.tar.xz ${PhpMyAdmin_Ver}.tar.xz
-    Download_Files ${Download_Mirror}/prober/p.tar.gz p.tar.gz
+    PhpMyAdmin_Ver_Short=$(echo ${PhpMyAdmin_Ver} | cut -d- -f2)
+    Download_Files https://files.phpmyadmin.net/phpMyAdmin/${PhpMyAdmin_Ver_Short}/${PhpMyAdmin_Ver}.tar.xz ${PhpMyAdmin_Ver}.tar.xz
     if [ "${Stack}" != "lnmp" ]; then
-        Download_Files ${Download_Mirror}/web/apache/${Apache_Ver}.tar.bz2 ${Apache_Ver}.tar.bz2
-        Download_Files ${Download_Mirror}/web/apache/${APR_Ver}.tar.bz2 ${APR_Ver}.tar.bz2
-        Download_Files ${Download_Mirror}/web/apache/${APR_Util_Ver}.tar.bz2 ${APR_Util_Ver}.tar.bz2
+        Download_Files https://archive.apache.org/dist/httpd/${Apache_Ver}.tar.bz2 ${Apache_Ver}.tar.bz2
+        Download_Files https://archive.apache.org/dist/apr/${APR_Ver}.tar.bz2 ${APR_Ver}.tar.bz2
+        Download_Files https://archive.apache.org/dist/apr/${APR_Util_Ver}.tar.bz2 ${APR_Util_Ver}.tar.bz2
     fi
 }
 
@@ -540,7 +565,7 @@ Install_Autoconf()
 {
     Echo_Blue "[+] Installing ${Autoconf_Ver}"
     cd ${cur_dir}/src
-    Download_Files ${Download_Mirror}/lib/autoconf/${Autoconf_Ver}.tar.gz ${Autoconf_Ver}.tar.gz
+    Download_Files https://ftp.gnu.org/gnu/autoconf/${Autoconf_Ver}.tar.gz ${Autoconf_Ver}.tar.gz
     Tar_Cd ${Autoconf_Ver}.tar.gz ${Autoconf_Ver}
     ./configure --prefix=/usr/local/autoconf-2.13
     Make_Install
@@ -562,6 +587,7 @@ Install_Libmcrypt()
 {
     Echo_Blue "[+] Installing ${LibMcrypt_Ver}"
     Tar_Cd ${LibMcrypt_Ver}.tar.gz ${LibMcrypt_Ver}
+    patch -p1 < ${cur_dir}/src/patch/libmcrypt.patch
     ./configure
     Make_Install
     /sbin/ldconfig
@@ -591,6 +617,7 @@ Install_Mhash()
 {
     Echo_Blue "[+] Installing ${Mhash_Ver}"
     Tar_Cd ${Mhash_Ver}.tar.bz2 ${Mhash_Ver}
+    patch -p1 < ${cur_dir}/src/patch/mhash.patch
     ./configure
     Make_Install
     ln -sf /usr/local/lib/libmhash.a /usr/lib/libmhash.a
@@ -606,12 +633,12 @@ Install_Mhash()
 Install_Freetype()
 {
     if echo "${Ubuntu_Version}" | grep -Eqi "^1[89]\.|2[0-9]\." || echo "${Mint_Version}" | grep -Eqi "^19|2[0-9]" || echo "${Deepin_Version}" | grep -Eqi "^15\.[7-9]|15.1[0-9]|1[6-9]|2[0-9]" || echo "${Debian_Version}" | grep -Eqi "^9|1[0-9]" || echo "${Raspbian_Version}" | grep -Eqi "^9|1[0-9]" || echo "${Kali_Version}" | grep -Eqi "^202[0-9]" || echo "${UOS_Version}" | grep -Eqi "^2[0-9]" || echo "${CentOS_Version}" | grep -Eqi "^8|9" || echo "${RHEL_Version}" | grep -Eqi "^8|9" || echo "${Oracle_Version}" | grep -Eqi "^8|9" || echo "${Fedora_Version}" | grep -Eqi "^3[0-9]|29" || echo "${Rocky_Version}" | grep -Eqi "^8|9" || echo "${Alma_Version}" | grep -Eqi "^8|9" || echo "${openEuler_Version}" | grep -Eqi "^2[0-9]" || echo "${Anolis_Version}" | grep -Eqi "^8|9" || echo "${Kylin_Version}" | grep -Eqi "^V1[0-9]" || echo "${Amazon_Version}" | grep -Eqi "^202[3-9]" || echo "${OpenCloudOS_Version}" | grep -Eqi "^8|9|23" || echo "${HCE_Version}" | grep -Eqi "^2\.[0-9]"; then
-        Download_Files ${Download_Mirror}/lib/freetype/${Freetype_New_Ver}.tar.xz ${Freetype_New_Ver}.tar.xz
+        Download_Files https://download.savannah.gnu.org/releases/freetype/${Freetype_New_Ver}.tar.xz ${Freetype_New_Ver}.tar.xz
         Echo_Blue "[+] Installing ${Freetype_New_Ver}"
         Tar_Cd ${Freetype_New_Ver}.tar.xz ${Freetype_New_Ver}
         ./configure --prefix=/usr/local/freetype --enable-freetype-config
     else
-        Download_Files ${Download_Mirror}/lib/freetype/${Freetype_Ver}.tar.bz2 ${Freetype_Ver}.tar.bz2
+        Download_Files https://download.savannah.gnu.org/releases/freetype/${Freetype_Ver}.tar.bz2 ${Freetype_Ver}.tar.bz2
         Echo_Blue "[+] Installing ${Freetype_Ver}"
         Tar_Cd ${Freetype_Ver}.tar.bz2 ${Freetype_Ver}
         ./configure --prefix=/usr/local/freetype
@@ -633,7 +660,7 @@ Install_Curl()
     if [[ ! -s /usr/local/curl/bin/curl || ! -s /usr/local/curl/lib/libcurl.so || ! -s /usr/local/curl/include/curl/curl.h ]]; then
         Echo_Blue "[+] Installing ${Curl_Ver}"
         cd ${cur_dir}/src
-        Download_Files ${Download_Mirror}/lib/curl/${Curl_Ver}.tar.bz2 ${Curl_Ver}.tar.bz2
+        Download_Files https://curl.se/download/${Curl_Ver}.tar.bz2 ${Curl_Ver}.tar.bz2
         Tar_Cd ${Curl_Ver}.tar.bz2 ${Curl_Ver}
         if [ -s /usr/local/openssl/bin/openssl ] || /usr/local/openssl/bin/openssl version | grep -Eqi 'OpenSSL 1.0.2'; then
             ./configure --prefix=/usr/local/curl --enable-ares --without-nss --with-zlib --with-ssl=/usr/local/openssl
@@ -653,7 +680,7 @@ Install_Pcre()
     if ! command -v pcre-config >/dev/null 2>&1 || pcre-config --version | grep -vEqi '^8.'; then
         Echo_Blue "[+] Installing ${Pcre_Ver}"
         cd ${cur_dir}/src
-        Download_Files ${Download_Mirror}/web/pcre/${Pcre_Ver}.tar.bz2 ${Pcre_Ver}.tar.bz2
+        Download_Files https://sourceforge.net/projects/pcre/files/pcre/8.45/${Pcre_Ver}.tar.bz2 ${Pcre_Ver}.tar.bz2
         Tar_Cd ${Pcre_Ver}.tar.bz2
         Nginx_With_Pcre="--with-pcre=${cur_dir}/src/${Pcre_Ver} --with-pcre-jit"
     fi
@@ -700,7 +727,7 @@ Install_Icu4c()
     if command -v icu-config >/dev/null 2>&1 && icu-config --version | grep -Eq "^3."; then
         Echo_Blue "[+] Installing ${Libicu4c_Ver}"
         cd ${cur_dir}/src
-        Download_Files ${Download_Mirror}/lib/icu4c/${Libicu4c_Ver}-src.tgz ${Libicu4c_Ver}-src.tgz
+        Download_Files https://fra.de.distfiles.macports.org/icu/${Libicu4c_Ver}-src.tgz ${Libicu4c_Ver}-src.tgz
         Tar_Cd ${Libicu4c_Ver}-src.tgz icu/source
         ./configure --prefix=/usr
         if [ ! -s /usr/include/xlocale.h ]; then
@@ -717,7 +744,7 @@ Install_Icu60()
     if [ ! -s /usr/local/icu/bin/icu-config ]; then
         Echo_Blue "[+] Installing icu4c-60_3..."
         cd ${cur_dir}/src
-        Download_Files ${Download_Mirror}/lib/icu4c/icu4c-60_3-src.tgz icu4c-60_3-src.tgz
+        Download_Files https://fra.de.distfiles.macports.org/icu/icu4c-60_3-src.tgz icu4c-60_3-src.tgz
         Tar_Cd icu4c-60_3-src.tgz icu/source
         ./configure --prefix=/usr/local/icu
         Make_Install
@@ -738,7 +765,7 @@ Download_Boost()
             MySQL_WITH_BOOST="-DWITH_BOOST=${cur_dir}/src/${Boost_Ver}"
         else
             cd ${cur_dir}/src/
-            Download_Files ${Download_Mirror}/lib/boost/${Boost_Ver}.tar.bz2 ${Boost_Ver}.tar.bz2
+            Download_Files https://sourceforge.net/projects/boost/files/boost/1.59.0/${Boost_Ver}.tar.bz2 ${Boost_Ver}.tar.bz2
             tar jxf ${cur_dir}/src/${Boost_Ver}.tar.bz2
             cd -
             MySQL_WITH_BOOST="-DWITH_BOOST=${cur_dir}/src/${Boost_Ver}"
@@ -778,7 +805,7 @@ Install_Openssl()
     if [ ! -s /usr/local/openssl/bin/openssl ] || /usr/local/openssl/bin/openssl version | grep -v 'OpenSSL 1.0.2'; then
         Echo_Blue "[+] Installing ${Openssl_Ver}"
         cd ${cur_dir}/src
-        Download_Files ${Download_Mirror}/lib/openssl/${Openssl_Ver}.tar.gz ${Openssl_Ver}.tar.gz
+        Download_Files https://www.openssl.org/source/${Openssl_Ver}.tar.gz ${Openssl_Ver}.tar.gz
         [[ -d "${Openssl_Ver}" ]] && rm -rf ${Openssl_Ver}
         Tar_Cd ${Openssl_Ver}.tar.gz ${Openssl_Ver}
         ./config -fPIC --prefix=/usr/local/openssl --openssldir=/usr/local/openssl
@@ -795,7 +822,7 @@ Install_Openssl_New()
         if [ ! -s /usr/local/openssl1.1.1/bin/openssl ] || /usr/local/openssl1.1.1/bin/openssl version | grep -v 'OpenSSL 1.1.1'; then
             Echo_Blue "[+] Installing ${Openssl_New_Ver}"
             cd ${cur_dir}/src
-            Download_Files ${Download_Mirror}/lib/openssl/${Openssl_New_Ver}.tar.gz ${Openssl_New_Ver}.tar.gz
+            Download_Files https://www.openssl.org/source/${Openssl_New_Ver}.tar.gz ${Openssl_New_Ver}.tar.gz
             [[ -d "${Openssl_New_Ver}" ]] && rm -rf ${Openssl_New_Ver}
             Tar_Cd ${Openssl_New_Ver}.tar.gz ${Openssl_New_Ver}
             ./config enable-weak-ssl-ciphers -fPIC --prefix=/usr/local/openssl1.1.1 --openssldir=/usr/local/openssl1.1.1
@@ -818,7 +845,7 @@ Install_Nghttp2()
     if [[ ! -s /usr/local/nghttp2/lib/libnghttp2.so || ! -s /usr/local/nghttp2/include/nghttp2/nghttp2.h ]]; then
         Echo_Blue "[+] Installing ${Nghttp2_Ver}"
         cd ${cur_dir}/src
-        Download_Files ${Download_Mirror}/lib/nghttp2/${Nghttp2_Ver}.tar.xz ${Nghttp2_Ver}.tar.xz
+        Download_Files https://ftp.osuosl.org/pub/blfs/conglomeration/nghttp2/${Nghttp2_Ver}.tar.xz ${Nghttp2_Ver}.tar.xz
         [[ -d "${Nghttp2_Ver}" ]] && rm -rf ${Nghttp2_Ver}
         Tar_Cd ${Nghttp2_Ver}.tar.xz ${Nghttp2_Ver}
         ./configure --prefix=/usr/local/nghttp2
@@ -834,7 +861,7 @@ Install_Libzip()
         if [ ! -s /usr/local/lib/libzip.so ]; then
             Echo_Blue "[+] Installing ${Libzip_Ver}"
             cd ${cur_dir}/src
-            Download_Files ${Download_Mirror}/lib/libzip/${Libzip_Ver}.tar.xz ${Libzip_Ver}.tar.xz
+            Download_Files https://libzip.org/download/${Libzip_Ver}.tar.xz ${Libzip_Ver}.tar.xz
             Tar_Cd ${Libzip_Ver}.tar.xz ${Libzip_Ver}
             ./configure
             Make_Install

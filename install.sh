@@ -64,7 +64,6 @@ Init_Install()
     Check_CMPT
     if [ "${CheckMirror}" != "n" ]; then
         Modify_Source
-        Check_Mirror
     fi
     Add_Swap
     Set_Timezone
