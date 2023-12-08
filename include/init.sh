@@ -121,16 +121,16 @@ Check_Hosts()
         echo "127.0.0.1 localhost.localdomain localhost" >> /etc/hosts
     fi
     if [ "${CheckMirror}" != "n" ]; then
-        pingresult=`ping -c1 cloudfalre.com 2>&1`
+        pingresult=`ping -c1 cloudflare.com 2>&1`
         echo "${pingresult}"
         if echo "${pingresult}" | grep -q "unknown host"; then
             echo "DNS...fail"
             echo "Writing nameserver to /etc/resolv.conf ..."
             if [ "${country}" = "CN" ]; then
                 echo -e "nameserver 208.67.220.220\nnameserver 114.114.114.114" > /etc/resolv.conf
-			else
+            else
                 echo -e "nameserver 1.1.1.1\nnameserver 8.8.8.8" > /etc/resolv.conf
-			fi
+            fi
         else
             echo "DNS...ok"
         fi
@@ -492,7 +492,7 @@ Check_Download()
                 Download_Files https://cdn.mysql.com/archives/mysql-8.4/${Mysql_Ver}-linux-glibc2.17-${DB_ARCH}.tar.xz ${Mysql_Ver}-linux-glibc2.17-${DB_ARCH}.tar.xz
             fi
         else
-		    Mysql_Ver_Short=$(echo ${Mysql_Ver} | sed 's/mysql-//' | cut -d. -f1-2)
+            Mysql_Ver_Short=$(echo ${Mysql_Ver} | sed 's/mysql-//' | cut -d. -f1-2)
             Download_Files https://cdn.mysql.com/Downloads/MySQL-${Mysql_Ver_Short}/${Mysql_Ver}.tar.gz ${Mysql_Ver}.tar.gz
             if [ $? -ne 0 ]; then
                 Download_Files https://cdn.mysql.com/archives/mysql-${Mysql_Ver_Short}/${Mysql_Ver}.tar.gz ${Mysql_Ver}.tar.gz

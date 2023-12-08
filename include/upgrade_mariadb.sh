@@ -135,7 +135,7 @@ Upgrade_MariaDB()
         echo "Notice: ${MariaDB_FileName}.tar.gz not found!!!download now......"
         if [ "${Bin}" = "y" ]; then
             if [ "${country}" = "CN" ]; then
-			    Download_Files https://mirrors.ustc.edu.cn/mariadb/mariadb-${mariadb_version}/bintar-linux-systemd-x86_64/${MariaDB_FileName}.tar.gz ${MariaDB_FileName}.tar.gz
+                Download_Files https://mirrors.ustc.edu.cn/mariadb/mariadb-${mariadb_version}/bintar-linux-systemd-x86_64/${MariaDB_FileName}.tar.gz ${MariaDB_FileName}.tar.gz
                 if [ $? -eq 0 ]; then
                     echo "Download ${MariaDB_FileName}.tar.gz successfully!"
                 else
@@ -148,7 +148,7 @@ Upgrade_MariaDB()
                     fi
                 fi
             else
-			    Download_Files https://downloads.mariadb.org/rest-api/mariadb/${mariadb_version}/${MariaDB_FileName}.tar.gz ${MariaDB_FileName}.tar.gz
+                Download_Files https://downloads.mariadb.org/rest-api/mariadb/${mariadb_version}/${MariaDB_FileName}.tar.gz ${MariaDB_FileName}.tar.gz
                 if [ $? -eq 0 ]; then
                     echo "Download ${MariaDB_FileName}.tar.gz successfully!"
                 else
@@ -176,7 +176,7 @@ Upgrade_MariaDB()
                     fi
                 fi
             else
-			    Download_Files https://downloads.mariadb.org/rest-api/mariadb/${mariadb_version}/${MariaDB_FileName}.tar.gz ${MariaDB_FileName}.tar.gz
+                Download_Files https://downloads.mariadb.org/rest-api/mariadb/${mariadb_version}/${MariaDB_FileName}.tar.gz ${MariaDB_FileName}.tar.gz
                 if [ $? -eq 0 ]; then
                     echo "Download ${MariaDB_FileName}.tar.gz successfully!"
                 else

@@ -214,8 +214,8 @@ Install_Composer()
                 curl -sS --connect-timeout 30 -m 60 https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer --2.2
                 if [ $? -eq 0 ]; then
                     echo "Composer install successfully."
-				else
-				    echo "Composer install failed."
+                else
+                    echo "Composer install failed."
                 fi
         else
             wget --progress=dot:giga --prefer-family=IPv4 --no-check-certificate -T 120 -t3 https://mirrors.aliyun.com/composer/composer.phar -O /usr/local/bin/composer
