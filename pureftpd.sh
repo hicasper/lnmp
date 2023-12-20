@@ -41,7 +41,10 @@ Install_Pureftpd()
     fi
     Echo_Blue "Download files..."
     cd ${cur_dir}/src
-    Download_Files https://download.pureftpd.org/pub/pure-ftpd/releases/${Pureftpd_Ver}.tar.bz2 ${Pureftpd_Ver}.tar.bz2
+    Download_Files https://download.pureftpd.org/pure-ftpd/releases/${Pureftpd_Ver}.tar.bz2 ${Pureftpd_Ver}.tar.bz2
+    if [ $? -ne 0 ]; then
+        Download_Files https://download.pureftpd.org/pure-ftpd/releases/obsolete/${Pureftpd_Ver}.tar.bz2 ${Pureftpd_Ver}.tar.bz2
+    fi
 
     Echo_Blue "Installing pure-ftpd..."
     Tar_Cd ${Pureftpd_Ver}.tar.bz2 ${Pureftpd_Ver}
