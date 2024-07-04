@@ -11,7 +11,7 @@ RUN set -ex && \
   bash docker-inst.sh && \
   apt-get install -y sysvinit-core --no-install-recommends && \
   rm -rf /var/lib/apt/lists/* && \
-  rm -rf /root/lnmp/src/*-*
+  find src -mindepth 1 -maxdepth 1 ! -name 'patch' ! -name 'gperftools-2.9.1.tar.gz' ! -name 'icu4c-60_3-src.tgz' ! -name 'jemalloc-5.3.0.tar.bz2' ! -name 'libunwind-1.2.1.tar.gz' ! -name 'p.tar.gz' ! -path 'src/patch/*' -exec rm -rf {} +
 
 VOLUME ["/home/wwwroot", "/home/wwwlogs", "/usr/local/nginx/conf"]
 
