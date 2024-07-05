@@ -580,10 +580,12 @@ Press_Start()
 {
     echo ""
     Echo_Green "Press any key to start...or Press Ctrl+c to cancel"
-    OLDCONFIG=`stty -g`
-    stty -icanon -echo min 1 time 0
-    dd count=1 2>/dev/null
-    stty ${OLDCONFIG}
+    if [ "${isDocker}" = "n" ]; then
+        OLDCONFIG=`stty -g`
+        stty -icanon -echo min 1 time 0
+        dd count=1 2>/dev/null
+        stty ${OLDCONFIG}
+    fi
 }
 
 Install_LSB()
