@@ -231,8 +231,9 @@ server
     {
         listen 80;
         #listen [::]:80;
-        #SSL#listen 443 ssl http2;
-        #SSL##listen [::]:443 ssl http2;
+        #SSL#listen 443 ssl;
+        #SSL##listen [::]:443 ssl;
+        #SSL#http2 on;
 
         server_name ${domain} ${moredomain};
         index index.html index.htm index.php default.html default.htm default.php;
@@ -1311,7 +1312,7 @@ Create_SSL_Config()
     fi
 
     if [ "${enable_ipv6}" == "y" ]; then
-        sed -i 's/#listen \[::\]:443 ssl http2;/listen \[::\]:443 ssl http2;/g' /usr/local/nginx/conf/vhost/${domain}.conf
+        sed -i 's/#listen \[::\]:443 ssl;/listen \[::\]:443 ssl;/g' /usr/local/nginx/conf/vhost/${domain}.conf
     fi
 
     echo "Test Nginx configure file......"
