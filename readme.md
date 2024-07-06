@@ -140,6 +140,24 @@ MySQL 8.4 | 11 | PHP 8.0 | 11 | | | |
 ### 卸载
 * 卸载LNMP、LNMPA或LAMP可执行：`./uninstall.sh` 按提示选择即可卸载。
 
+### Docker镜像制作
+> 仅作参考，具体步骤请自行调试
+
+在Github Actions中手动运行，指定提交镜像tag，为了避免转义等问题，设置了一个编译变量`AUTOCMD`，内容则为Base64编码后的Bash脚本，用于执行安装lnmp以及后续优化清理，以下是一段实例（无人值守编译安装Nginx，MySQL 8.4，PHP 8.3，Jemalloc，并安装OpCache和Redis的PHP扩展，不安装Redis Server）：
+
+```
+base64 -w0 <<EOF
+#!/bin/bash
+LNMP_Auto="y" DBSelect="11" Bin="n" PHPSelect="14" SelectMalloc="2" timeout 100m ./install.sh lnmp;
+echo | ./addons.sh install opcache;
+mkdir -p /usr/local/redis/bin;
+echo ' ' > /usr/local/redis/bin/redis-server;
+sed -i.bak '/init.d.redis/,+7d' include/redis.sh;
+echo | ./addons.sh install redis;
+mv -f include/redis.sh.bak include/redis.sh;
+EOF
+```
+
 ## 状态管理
 * LNMP/LNMPA/LMAP状态管理：`lnmp {start|stop|reload|restart|kill|status}`
 * Nginx状态管理：`lnmp nginx或/etc/init.d/nginx {start|stop|reload|restart}`
